@@ -23,46 +23,41 @@ public class GameController {
     private GenericTile[][] maze;
     private String[][][] statusString;
     Random random = new Random();
-
-    //TODO: -agent: GenericAgent 
-
-    //TODO: -agentLocation: int[2]
-    
-    //TODO: -turnCounter: int
-
+    private GenericAgent agent = new GenericAgent();
+    private int[] agentLocation = new int[2];
+    private int turnCounter;
 
     public void createMaze(int a, int b) {
 
         maze = new GenericTile[a][b];
 
-            for(int i = 0; i < maze.length; i++) {
-                for(int j = 0; j < maze.length; j++) {
-                    maze[i][j] = new GenericTile();
-                    boolean[] doorStatus = new boolean[4];
-                    for(int k = 0; k < 4; k++) {
-                        doorStatus[k] = random.nextBoolean();
-                    }
-                    maze[i][j].setExits(doorStatus);
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze.length; j++) {
+                maze[i][j] = new GenericTile();
+                boolean[] doorStatus = new boolean[4];
+                for (int k = 0; k < 4; k++) {
+                    doorStatus[k] = random.nextBoolean();
                 }
+                maze[i][j].setExits(doorStatus);
             }
-            statusString = new String[a][b][4];
+        }
+        statusString = new String[a][b][4];
 
-            GenericTile start = maze[0][(b-1)/2];
-            GenericTile goal = maze[a-1][(b-1)/2];
+        GenericTile start = maze[0][(b - 1) / 2];
+        GenericTile goal = maze[a - 1][(b - 1) / 2];
 
-        }        
+    }
 
     public void convertExitsToString() {
         String tempString;
 
-        for(int i = 0; i < maze.length; i++) {
-            for(int j = 0; j < maze.length; j++) {
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze.length; j++) {
                 boolean[] stringBool = maze[i][j].getExits();
-                for(int k = 0; k < 4; k++) {
-                    if( stringBool[k]) {
+                for (int k = 0; k < 4; k++) {
+                    if (stringBool[k]) {
                         tempString = "U";
-                    }
-                    else {
+                    } else {
                         tempString = "L";
                     }
                     statusString[i][j][k] = tempString;
@@ -73,11 +68,12 @@ public class GameController {
 
     public void printMaze() {
         convertExitsToString();
-        for(int i = 0; i < maze.length; i++) {
-            for(int j = 0; j < maze.length; j++) {
-                System.out.println("Tile (" + i + "," + j + ") (N, S, E, W) status: (" + statusString[i][j][0] + ", " + statusString[i][j][1] + ", " + statusString[i][j][2] + ", " + statusString[i][j][3] + ")");
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze.length; j++) {
+                System.out.println("Tile (" + i + "," + j + ") (N, S, E, W) status: (" + statusString[i][j][0] + ", "
+                        + statusString[i][j][1] + ", " + statusString[i][j][2] + ", " + statusString[i][j][3] + ")");
             }
-        } 
+        }
     }
 
     public void printMazeSummary() {
@@ -88,7 +84,8 @@ public class GameController {
 
         printMaze();
 
-        System.out.println("There are " + maze.length + " rows and columns in the Maze." + " Start is (" + x + ", " + y + "), and the Goal is at (" + p + ", " + q + ").");
+        System.out.println("There are " + maze.length + " rows and columns in the Maze." + " Start is (" + x + ", " + y
+                + "), and the Goal is at (" + p + ", " + q + ").");
     }
 
     public GenericTile[][] getMaze() {
@@ -107,23 +104,53 @@ public class GameController {
         this.statusString = statusString;
     }
 
-    //TODO: +playGame(): void
-    
-    //TODO: +agentIsInGoal(): boolean
-    
-    //TODO: +hasAgentWon(): boolean
-    
-    //TODO: +hasAgentLost(): boolean
-    
-    //TODO: +moveAgent(): void
-    
-    //TODO: +isMoveLegal(): boolean
-    
-    //TODO: +isDoorLocked(GenericTile, int): boolean
-    
-    //TODO: +printAgentLocation(): void
-    
-    //TODO: +setAgent(Agent): void
+    // TODO: +playGame(): void
+
+    public boolean agentIsInGoal() {
+        boolean agentIsInGoal = false;
+        int p = (maze.length - 1);
+        int q = (maze.length - 1) / 2;
+
+        if (agentLocation[0] == p && agentLocation[1] == q) {
+            agentIsInGoal = true;
+        }
+
+        return agentIsInGoal;
+    }
+
+    public boolean hasAgentWon() {
+        boolean hasAgentWon = false;
+
+        if (agentIsInGoal() == true) {
+            hasAgentWon = true;
+            System.out.println("Agent has won the game.");
+        }
+        return hasAgentWon;
+    }
+
+    public boolean hasAgentLost() {
+        boolean hasAgentLost = false;
+        if (turnCounter == 50 && hasAgentWon() == false) {
+            hasAgentLost = true;
+        }
+        return hasAgentLost;
+    }
+
+    // TODO: +moveAgent(): void
+    public void moveAgent() {
+        agent.move();
+        turnCounter++;
+    }
+
+    // TODO:  +isMoveLegal(): boolean
+    public boolean isMoveLegal() {
+        boolean isMoveLegal = false;
+        return isMoveLegal;
+    }
+
+    // TODO: +isDoorLocked(GenericTile, int): boolean
+
+    // TODO: +printAgentLocation(): void
+
+    // TODO: +setAgent(Agent): void
 }
-
-

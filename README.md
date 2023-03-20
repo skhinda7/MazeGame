@@ -1,6 +1,6 @@
 ## Getting Started
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+This is my homework assignment for CS 225 at Embry-Riddle Aeronutical University. It will be updated with each homework until the entire maze game is complete and able to run. 
 
 ## Folder Structure
 
