@@ -15,35 +15,37 @@
 import java.util.Scanner;
 
 public class MGMain {
-    Scanner in = new Scanner( System.in);
+    Scanner in = new Scanner(System.in);
     GameController ctrl = new GameController();
+
     public static void main(String[] args) {
         MGMain game = new MGMain();
 
         game.createMaze();
     }
-    
+
     public void createMaze() {
-        
+
         int mazeSize;
-        
+
         do {
             System.out.println("Enter the maze size: ");
             mazeSize = in.nextInt();
 
-            if(mazeSize % 2 == 0) {
+            if (mazeSize % 2 == 0) {
                 System.out.println("The maze size must be an odd integer.");
             } else {
                 ctrl.createMaze(mazeSize, mazeSize);
                 ctrl.printMazeSummary();
+                playGame();
             }
         } while (mazeSize % 2 == 0);
     }
 
-    //TODO: +createAgent( Agent ): void
-    
-    //TODO: +playGame(): void
+    // TODO: +createAgent( Agent ): void
 
-
+    public void playGame() {
+        ctrl.playGame();
+    }
 
 }

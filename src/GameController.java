@@ -22,11 +22,10 @@ import java.util.Random;
 public class GameController {
     private GenericTile[][] maze;
     private String[][][] statusString;
-    Random random = new Random();
     private GenericAgent agent = new GenericAgent();
+    Random random = new Random();
     private int[] agentLocation = new int[2];
     private int turnCounter;
-    private int n = maze.length;
 
     // +createMaze(int, int): void
     public void createMaze(int a, int b) {
@@ -95,6 +94,10 @@ public class GameController {
 
     // +playGame(): void
     public void playGame() {
+        while (hasAgentWon() ^ hasAgentLost()) {
+            moveAgent();
+            printAgentLocation();
+        }
         if (hasAgentWon() == true) {
             System.out.println("Agent has won the game.");
         } else if (hasAgentLost() == true) {
@@ -146,8 +149,8 @@ public class GameController {
     // +isMoveLegal(): boolean
     public boolean isMoveLegal() {
         boolean isMoveLegal = false;
-        if (agentLocation[0] >= 0 && agentLocation[0] <= (n - 1)) {
-            if (agentLocation[1] >= 0 && agentLocation[1] <= (n - 1)) {
+        if (agentLocation[0] >= 0 && agentLocation[0] <= (maze.length - 1)) {
+            if (agentLocation[1] >= 0 && agentLocation[1] <= (maze.length - 1)) {
                 isMoveLegal = true;
             }
         }
@@ -167,7 +170,9 @@ public class GameController {
 
     // +isDoorUnlocked(): boolean
     public void printAgentLocation() {
-        System.out.println("Agent is at (" + agentLocation[0] + ", " + agentLocation[1] + ").");
+        System.out.println("Unlocked door is: " + agent.move());
+        System.out.println(
+                "Agent is at (" + agentLocation[0] + ", " + agentLocation[1] + "). Amount of turns: " + turnCounter);
     }
 
     // +setAgent(GenericAgent): void
@@ -175,7 +180,8 @@ public class GameController {
         this.agent = agent;
     }
 
-    // ************************************** Getters and Setters **************************************
+    // ************************************** Getters and Setters
+    // **************************************
 
     public GenericTile[][] getMaze() {
         return this.maze;
@@ -191,14 +197,6 @@ public class GameController {
 
     public void setStatusString(String[][][] statusString) {
         this.statusString = statusString;
-    }
-
-    public Random getRandom() {
-        return this.random;
-    }
-
-    public void setRandom(Random random) {
-        this.random = random;
     }
 
     public GenericAgent getAgent() {
@@ -221,11 +219,4 @@ public class GameController {
         this.turnCounter = turnCounter;
     }
 
-    public int getN() {
-        return this.n;
-    }
-
-    public void setN(int n) {
-        this.n = n;
-    }
 }
