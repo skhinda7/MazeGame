@@ -2,18 +2,30 @@
 // Class: GameController
 // Author: Simardeep Khinda
 // Created: 03/03/2023
-// Modified: 
+// Modified: 03/22/2023 - Added agent to move through the maze
 //
-// Purpose: GameController initializes and creates an array of GenericTiles. It creates random locked and unlocked doors for each tile. The methods are called in MGMain.
+// Purpose: GameController initializes and creates an array of GenericTiles. It creates random locked and unlocked doors for each tile. Furthermore, it runs an agent through the maze and checks if the agent made it to the goal.
 //
 // Attributes: 
 //			-maze: GenericTile[][]
 //          -statusString: String[][][]
+//          -agent: GenericAgent 
+//          -agentLocation: int[]
+//          -turnCounter: int
 //
 // Methods: +createMaze(int, int): void
 //          +convertExitsToString(): void
 //          +printMaze(): void
 //          +printMazeSummary(): void
+//          +playGame(): void
+//          +agentIsInGoal(): boolean
+//          +hasAgentWon(): boolean
+//          +hasAgentLost(): boolean
+//          +moveAgent(): void
+//          +isMoveLegal(): boolean
+//          +isDoorLocked(): boolean
+//          +printAgentLocation(): void
+//          +setAgent(GenericAgent): void
 //
 //*********************************************************
 
@@ -47,6 +59,9 @@ public class GameController {
         GenericTile start = maze[0][(b - 1) / 2];
         GenericTile goal = maze[a - 1][(b - 1) / 2];
 
+        agentLocation[0] = (b - 1) / 2;
+        agentLocation[1] = 0;
+
     }
 
     // +convertExitsToString(): void
@@ -73,43 +88,45 @@ public class GameController {
         convertExitsToString();
         for (int i = 0; i < maze.length; i++) {
             for (int j = 0; j < maze.length; j++) {
-                System.out.println("Tile (" + i + "," + j + ") (N, S, E, W) status: (" + statusString[i][j][0] + ", "
+                System.out.println("Tile (" + i + "," + j + ") (N, E, S, W) status: (" + statusString[i][j][0] + ", "
                         + statusString[i][j][1] + ", " + statusString[i][j][2] + ", " + statusString[i][j][3] + ")");
             }
+            System.out.println("\n");
         }
     }
 
     // +printMazeSummary(): void
     public void printMazeSummary() {
-        int x = 0;
-        int y = (maze.length - 1) / 2;
-        int p = (maze.length - 1);
-        int q = (maze.length - 1) / 2;
+        int x = (maze.length - 1) / 2;
+        int y = 0;
+        int p = (maze.length - 1) / 2;
+        int q = (maze.length - 1);
 
         printMaze();
 
         System.out.println("There are " + maze.length + " rows and columns in the Maze." + " Start is (" + x + ", " + y
                 + "), and the Goal is at (" + p + ", " + q + ").");
+        System.out.println("Agent's starting position: (" + agentLocation[0] + ", " + agentLocation[1] + ")\n");
+
     }
 
     // +playGame(): void
     public void playGame() {
-        while (hasAgentWon() ^ hasAgentLost()) {
+        while (!hasAgentLost() && !hasAgentWon()) {
             moveAgent();
-            printAgentLocation();
         }
-        if (hasAgentWon() == true) {
-            System.out.println("Agent has won the game.");
-        } else if (hasAgentLost() == true) {
-            System.out.println("Agent has lost the game.");
+        if (hasAgentWon()) {
+            System.out.println("\nAgent has won the game!");
+        } else if (hasAgentLost()) {
+            System.out.println("\nAgent has lost the game.");
         }
     }
 
     // +agentIsInGoal(): boolean
     public boolean agentIsInGoal() {
         boolean agentIsInGoal = false;
-        int x = (maze.length - 1);
-        int y = (maze.length - 1) / 2;
+        int x = (maze.length - 1) / 2;
+        int y = (maze.length - 1);
 
         if (agentLocation[0] == x && agentLocation[1] == y) {
             agentIsInGoal = true;
@@ -122,9 +139,8 @@ public class GameController {
     public boolean hasAgentWon() {
         boolean hasAgentWon = false;
 
-        if (agentIsInGoal() == true) {
+        if (agentIsInGoal()) {
             hasAgentWon = true;
-            System.out.println("Agent has won the game.");
         }
         return hasAgentWon;
     }
@@ -132,7 +148,7 @@ public class GameController {
     // +hasAgentLost(): boolean
     public boolean hasAgentLost() {
         boolean hasAgentLost = false;
-        if (turnCounter == 50 && hasAgentWon() == false) {
+        if (turnCounter >= 50) {
             hasAgentLost = true;
         }
         return hasAgentLost;
@@ -140,19 +156,35 @@ public class GameController {
 
     // +moveAgent(): void
     public void moveAgent() {
+        int direction = agent.move(); // Initial random direction
 
-        agent.move();
-        printAgentLocation();
-        turnCounter++;
+        if (direction == 0 && agentLocation[1] > 0 && isMoveLegal(direction)) { // North
+            agentLocation[1]--;
+            turnCounter++;
+            printAgentLocation();
+        } else if (direction == 1 && agentLocation[0] < maze.length - 1 && isMoveLegal(direction)) { // East
+            agentLocation[0]++;
+            turnCounter++;
+            printAgentLocation();
+        } else if (direction == 2 && agentLocation[1] < maze.length - 1 && isMoveLegal(direction)) { // South
+            agentLocation[1]++;
+            turnCounter++;
+            printAgentLocation();
+        } else if (direction == 3 && agentLocation[0] > 0 && isMoveLegal(direction)) { // West
+            agentLocation[0]--;
+            turnCounter++;
+            printAgentLocation();
+        }
     }
 
     // +isMoveLegal(): boolean
-    public boolean isMoveLegal() {
+    public boolean isMoveLegal(int direction) {
         boolean isMoveLegal = false;
-        if (agentLocation[0] >= 0 && agentLocation[0] <= (maze.length - 1)) {
-            if (agentLocation[1] >= 0 && agentLocation[1] <= (maze.length - 1)) {
-                isMoveLegal = true;
-            }
+        if (!isDoorLocked(maze[agentLocation[0]][agentLocation[1]], direction)) {
+            isMoveLegal = true;
+        } else {
+            turnCounter++;
+            System.out.println("Invalid Move on Turn " + turnCounter);
         }
         return isMoveLegal;
     }
@@ -160,19 +192,20 @@ public class GameController {
     // +isDoorLocked(): boolean
     public boolean isDoorLocked(GenericTile tile, int direction) {
         boolean isDoorLocked = false;
+        boolean[] doors = tile.getExits();
 
-        if (tile.getExits()[direction] == true) {
+        if (doors[direction]) {
+            isDoorLocked = false;
+        } else {
             isDoorLocked = true;
         }
-
         return isDoorLocked;
     }
 
-    // +isDoorUnlocked(): boolean
+    // +printAgentLocation(): void
     public void printAgentLocation() {
-        System.out.println("Unlocked door is: " + agent.move());
         System.out.println(
-                "Agent is at (" + agentLocation[0] + ", " + agentLocation[1] + "). Amount of turns: " + turnCounter);
+                "Agent location: (" + agentLocation[0] + ", " + agentLocation[1] + ") on Turn " + turnCounter);
     }
 
     // +setAgent(GenericAgent): void
@@ -180,8 +213,7 @@ public class GameController {
         this.agent = agent;
     }
 
-    // ************************************** Getters and Setters
-    // **************************************
+    // Getters and Setters
 
     public GenericTile[][] getMaze() {
         return this.maze;
