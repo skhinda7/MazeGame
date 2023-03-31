@@ -1,6 +1,6 @@
 ## Getting Started
 
-This is my homework assignment for CS 225 at Embry-Riddle Aeronutical University. It will be updated with each homework until the entire maze game is complete and able to run. 
+This is my homework assignment for CS 225 at Embry-Riddle Aeronutical University. This is completed with week-by-week homework assignments throughout the semester. Requirements, instructions, and information about the game were provided by the instructor. It will be updated with each homework until the entire maze game is complete and able to run. 
 
 ## Folder Structure
 
