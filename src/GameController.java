@@ -41,12 +41,11 @@ public class GameController {
 
     // +createMaze(int, int): void
     public void createMaze(int a, int b) {
-
         maze = new GenericTile[a][b];
-
         for (int i = 0; i < maze.length; i++) {
             for (int j = 0; j < maze.length; j++) {
-                maze[i][j] = new GenericTile();
+                maze[i][j] = pickTileType();
+                getName(maze[i][j]);
                 boolean[] doorStatus = new boolean[4];
                 for (int k = 0; k < 4; k++) {
                     doorStatus[k] = random.nextBoolean();
@@ -54,6 +53,7 @@ public class GameController {
                 maze[i][j].setExits(doorStatus);
             }
         }
+        checkAtleastOne();
         statusString = new String[a][b][4];
 
         GenericTile start = maze[0][(b - 1) / 2];
@@ -62,6 +62,63 @@ public class GameController {
         agentLocation[0] = (b - 1) / 2;
         agentLocation[1] = 0;
 
+    }
+
+    public void checkAtleastOne() {
+        boolean foundRotating = false;
+        boolean foundSolid = false;
+        boolean foundStatic = false;
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze.length; j++) {
+                if (maze[i][j] instanceof RotatingTile) {
+                    foundRotating = true;
+                }
+                if (maze[i][j] instanceof SolidTile) {
+                    foundSolid = true;
+                }
+                if (maze[i][j] instanceof StaticTile) {
+                    foundStatic = true;
+                }
+            }
+        }
+        if (foundRotating == false) {
+            maze[random.nextInt(maze.length)][random.nextInt(maze.length)] = new RotatingTile();
+        }
+        if (foundSolid == false) {
+            maze[random.nextInt(maze.length)][random.nextInt(maze.length)] = new SolidTile();
+
+        }
+        if (foundStatic == false) {
+            maze[random.nextInt(maze.length)][random.nextInt(maze.length)] = new StaticTile();
+
+        }
+    }
+
+    public void getName(GenericTile tile) {
+        if (tile instanceof StaticTile) {
+            tile.setDescription("Static");
+        } else if (tile instanceof RotatingTile) {
+            tile.setDescription("Rotating");
+        } else if (tile instanceof SolidTile) {
+            tile.setDescription("Solid");
+        }
+    }
+
+    public GenericTile pickTileType() {
+        GenericTile pickedDoor = new GenericTile();
+        int randNum = random.nextInt(3);
+        switch (randNum) {
+            case 0:
+                pickedDoor = new RotatingTile();
+                break;
+            case 1:
+                pickedDoor = new SolidTile();
+                break;
+            case 2:
+                pickedDoor = new StaticTile();
+                break;
+        }
+        return pickedDoor;
     }
 
     // +convertExitsToString(): void
@@ -89,7 +146,8 @@ public class GameController {
         for (int i = 0; i < maze.length; i++) {
             for (int j = 0; j < maze.length; j++) {
                 System.out.println("Tile (" + i + "," + j + ") (N, E, S, W) status: (" + statusString[i][j][0] + ", "
-                        + statusString[i][j][1] + ", " + statusString[i][j][2] + ", " + statusString[i][j][3] + ")");
+                        + statusString[i][j][1] + ", " + statusString[i][j][2] + ", " + statusString[i][j][3]
+                        + ") | Type: " + maze[i][j].getDescription());
             }
             System.out.println("\n");
         }
@@ -157,24 +215,51 @@ public class GameController {
     // +moveAgent(): void
     public void moveAgent() {
         int direction = agent.move(); // Initial random direction
+        GenericTile location = maze[agentLocation[0]][agentLocation[1]];
+        boolean[] locationExits = location.getExits();
+
+        // TODO: Implement special action to be called with likelihood of 1%
+        int chanceOfSpecial = random.nextInt(100);
 
         if (direction == 0 && agentLocation[1] > 0 && isMoveLegal(direction)) { // North
             agentLocation[1]--;
+            maze[agentLocation[0]][agentLocation[1] + 1].exitAction();
+            if (location instanceof RotatingTile) {
+                System.out.println("Tile (" + agentLocation[0] + ", " + (agentLocation[1] + 1) + ") rotates clockwise");
+            }
             turnCounter++;
+            location.enterAction();
             printAgentLocation();
         } else if (direction == 1 && agentLocation[0] < maze.length - 1 && isMoveLegal(direction)) { // East
             agentLocation[0]++;
+            maze[agentLocation[0] - 1][agentLocation[1]].exitAction();
+            if (location instanceof RotatingTile) {
+                System.out.println("Tile (" + (agentLocation[0] - 1) + ", " + agentLocation[1] + ") rotates clockwise");
+            }
             turnCounter++;
+            location.enterAction();
             printAgentLocation();
         } else if (direction == 2 && agentLocation[1] < maze.length - 1 && isMoveLegal(direction)) { // South
             agentLocation[1]++;
+            maze[agentLocation[0]][agentLocation[1] - 1].exitAction();
+            ;
+            if (location instanceof RotatingTile) {
+                System.out.println("Tile (" + agentLocation[0] + ", " + (agentLocation[1] - 1) + ") rotates clockwise");
+            }
             turnCounter++;
+            location.enterAction();
             printAgentLocation();
         } else if (direction == 3 && agentLocation[0] > 0 && isMoveLegal(direction)) { // West
             agentLocation[0]--;
+            maze[agentLocation[0] + 1][agentLocation[1]].exitAction();
+            if (location instanceof RotatingTile) {
+                System.out.println("Tile (" + (agentLocation[0] + 1) + ", " + agentLocation[1] + ") rotates clockwise");
+            }
             turnCounter++;
+            location.enterAction();
             printAgentLocation();
         }
+
     }
 
     // +isMoveLegal(): boolean
