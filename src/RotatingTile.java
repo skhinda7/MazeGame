@@ -1,3 +1,21 @@
+//*********************************************************
+// Class: RotatingTile
+// Author: Simardeep Khinda
+// Created: 03/29/2023
+// Modified: 
+//
+// Purpose: This class represents an individual tile with an exit action of rotating doors clockwise. Special action rotates doors counter-clockwise.
+//
+// Attributes: 
+//			-exits: boolean[]
+//			-description: String
+//		
+// Methods: +enterAction(): void
+//          +exitAction(): void
+//          +specialAction(): void
+//
+//*********************************************************
+
 public class RotatingTile extends GenericTile {
 
     public void enterAction() {

@@ -37,6 +37,7 @@ public class MGMain {
                 System.out.println("The maze size must be an odd integer.");
             }
         } while (mazeSize % 2 == 0);
+        System.out.println("\n");
 
         ctrl.createMaze(mazeSize, mazeSize);
         playGame();
