@@ -87,6 +87,7 @@ public class GameController {
                 }
             }
         }
+
         if (foundRotating == false) {
             GenericTile rotateTile = maze[random.nextInt(maze.length)][random.nextInt(maze.length)];
             rotateTile = new RotatingTile();
@@ -102,7 +103,6 @@ public class GameController {
             GenericTile staticTile = maze[random.nextInt(maze.length)][random.nextInt(maze.length)];
             staticTile = new StaticTile();
             setType(staticTile);
-
         }
     }
 
